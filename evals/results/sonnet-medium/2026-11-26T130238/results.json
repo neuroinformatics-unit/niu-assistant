@@ -1,0 +1,238 @@
+[
+ {
+  "id": "ssh-cluster",
+  "question": "How do I connect to the SWC HPC cluster from my laptop?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 39.2,
+  "tries": [
+   {
+    "answer": "## Connecting to the SWC HPC cluster\n\n**If you're at SWC on a wired connection, or on the SWC VPN**, connect directly to the gateway node:\n```\nssh <SWC-USERNAME>@hpc-gw2.hpc.swc.ucl.ac.uk\n```\n\n**Otherwise** (e.g. from home, on eduroam), you need to go through the bastion node first, then hop to the gateway:\n```\nssh <SWC-USERNAME>@ssh.swc.ucl.ac.uk\n<SWC-USERNAME>@sgw2:~$ ssh hpc-gw2\n```\nYou'll be prompted for your SWC password each time (it won't display as you type). Type `exit` to go back a step.\n\n**To skip typing the full address each time**, add this to `~/.ssh/config` on your laptop:\n```\nHost swc-bastion\n    HostName ssh.swc.ucl.ac.uk\n    User <SWC-USERNAME>\n\nHost swc-gateway\n    HostName hpc-gw2\n    User <SWC-USERNAME>\n    ProxyJump swc-bastion\n```\nThen just run `ssh swc-gateway`.\n\n**To avoid typing your password every time**, set up SSH keys:\n```\nssh-keygen -t ed25519\nssh-copy-id -i ~/.ssh/id_ed25519.pub swc-gateway\n```\n\nNote: the *gateway* node is only for navigating the filesystem, editing scripts, and submitting SLURM jobs \u2014 don't run computations there directly; use `srun`/`sbatch` to get a compute node instead.\n\nWindows users: Git Bash is recommended so the commands above work as-is; native `cmd`/PowerShell is possible too but the SSH key section doesn't apply the same way.\n\nSource: [Set up SSH for the SWC HPC cluster](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/programming/SSH-SWC-cluster.md)",
+    "pages": [
+     "niu-howto/programming/SSH-SWC-cluster.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "## Connecting to the SWC HPC cluster via SSH\n\n**If you're on-site at SWC (wired, not eduroam) or on the SWC VPN:**\n```\nssh <SWC-USERNAME>@hpc-gw2.hpc.swc.ucl.ac.uk\n```\n\n**From anywhere else** (e.g. your laptop off-site), you need to hop through the bastion node first:\n```\nssh <SWC-USERNAME>@ssh.swc.ucl.ac.uk\n```\nthen, once on the bastion:\n```\nssh hpc-gw2\n```\n\nType your SWC password when prompted (it won't display as you type). Type `exit` to go back a step.\n\n**To skip typing two commands every time**, add this to `~/.ssh/config` on your laptop:\n```\nHost swc-bastion\n    HostName ssh.swc.ucl.ac.uk\n    User <SWC-USERNAME>\n\nHost swc-gateway\n    HostName hpc-gw2\n    User <SWC-USERNAME>\n    ProxyJump swc-bastion\n```\nThen just run `ssh swc-gateway`.\n\n**To avoid typing your password each time**, generate an SSH key pair and copy it over:\n```\nssh-keygen -t ed25519\nssh-copy-id -i ~/.ssh/id_ed25519.pub swc-gateway\n```\n\nNote: the gateway node (`hpc-gw2`) is only for navigating the filesystem, editing scripts, and submitting jobs \u2014 don't run computations there; use `srun`/`sbatch` to get a compute node instead.\n\nSource: [Set up SSH for the SWC HPC cluster](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/programming/SSH-SWC-cluster.md)",
+    "pages": [
+     "",
+     "niu-howto/programming/SSH-SWC-cluster.md"
+    ],
+    "missing": []
+   }
+  ]
+ },
+ {
+  "id": "slurm-gpu",
+  "question": "How do I ask for a GPU in a SLURM batch script?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 35.1,
+  "tries": [
+   {
+    "answer": "To request a GPU in an SBATCH script on the SWC HPC cluster, use the `--gres` directive combined with the `gpu` partition:\n\n```bash\n#SBATCH -p gpu           # partition (queue)\n#SBATCH --gres gpu:1     # request 1 GPU (of any kind)\n```\n\nKey points:\n- **No GPU is allocated unless you specify `--gres`**, even if your job is on the `gpu` partition.\n- To request a specific GPU type, include its name: `--gres gpu:rtx2080:1`, `--gres gpu:rtx5000:1`, `--gres gpu:a100_2g.10gb:1`, etc.\n- Available GPU types are listed on the SWC internal wiki (linked from the doc below).\n\nSource: [SLURM arguments primer](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/programming/SLURM-arguments.md)",
+    "pages": [
+     "niu-howto/programming/SLURM-arguments.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "To request a GPU in a SLURM batch script, use two `#SBATCH` directives together:\n\n1. **Partition** \u2014 submit to the `gpu` partition:\n   ```\n   #SBATCH -p gpu\n   ```\n2. **Generic resources (GPU)** \u2014 explicitly request the GPU via `--gres`:\n   ```\n   #SBATCH --gres gpu:1\n   ```\n\nNote: no GPU is allocated unless you specify `--gres`, even if you're on the `gpu` partition.\n\n- To request 1 GPU of any kind: `--gres gpu:1`\n- To request a specific GPU type: `--gres gpu:rtx2080:1`, `--gres gpu:rtx5000:1`, `--gres gpu:a100_2g.10gb:1`\n\nExample script:\n```bash\n#!/bin/bash\n\n#SBATCH -J my_job # job name\n#SBATCH -p gpu # partition (queue)\n#SBATCH -N 1   # number of nodes\n#SBATCH --mem 16G # memory pool for all cores\n#SBATCH -n 4 # number of cores\n#SBATCH -t 0-06:00 # time (D-HH:MM)\n#SBATCH --gres gpu:1 # request 1 GPU (of any kind)\n#SBATCH -o slurm.%x.%N.%j.out # STDOUT\n#SBATCH -e slurm.%x.%N.%j.err # STDERR\n```\n\nYou can see available GPU types on the SWC internal wiki (linked in the doc below).\n\nSource: [SLURM arguments primer](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/programming/SLURM-arguments.md)",
+    "pages": [
+     "niu-howto/programming/SLURM-arguments.md"
+    ],
+    "missing": []
+   }
+  ]
+ },
+ {
+  "id": "jupyter-on-node",
+  "question": "I'm running Jupyter on a cluster node. How do I open it in my browser?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 43.0,
+  "tries": [
+   {
+    "answer": "Here's how to open Jupyter from a cluster compute node in your browser, using SSH port forwarding:\n\n**1. Connect to the cluster and get an interactive job** (if you haven't already):\n```bash\nssh <SWC-USERNAME>@ssh.swc.ucl.ac.uk\nssh hpc-gw2\nsrun -p gpu --gres=gpu:1 --mem=16G --pty bash -i\n```\n\n**2. On the assigned compute node**, launch Jupyter without opening a browser there, on a specific port:\n```bash\nconda activate my_env\ncd /path/to/your/project\njupyter lab --no-browser --port=8082\n```\nJupyter prints output with a line like:\n```\nhttp://localhost:8082/lab?token=abc123def456...\n```\nNote the port number and this full URL (with the token).\n\n**3. On your local machine**, open a new terminal and forward that port through the bastion and gateway:\n```bash\nssh -N <SWC-USERNAME>@<node-name> -J <SWC-USERNAME>@ssh.swc.ucl.ac.uk,<SWC-USERNAME>@hpc-gw2 -L 8082:localhost:8082\n```\nReplace `<node-name>` with your actual assigned compute node (e.g. `gpu-sr670-20`).\n\n**4. In your local browser**, paste the complete URL from step 2 (including the `?token=` part) \u2014 that's what authenticates you to the Jupyter server.\n\nTroubleshooting notes from the doc: make sure both commands use the same port, keep the SLURM session active (don't let it drop), and if the port is already in use try another (e.g. `8888`, `8090`) in both commands.\n\nSource: [Accessing HTTP servers on the HPC with port forwarding](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/programming/port-forwarding.md)",
+    "pages": [
+     "niu-howto/programming/port-forwarding.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "Here's the process, from the NIU how-to guide on [port forwarding on the HPC](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/programming/port-forwarding.md):\n\n**1. On the compute node**, launch Jupyter without a browser, on a specific port:\n```bash\njupyter lab --no-browser --port=8082\n```\nJupyter's output will include lines starting \"Or copy and paste one of these URLs:\" \u2014 note the full URL with the `?token=...` part.\n\n**2. On your local machine**, open a new terminal and forward that port through the bastion and gateway to the compute node:\n```bash\nssh -N <SWC-USERNAME>@<node-name> -J <SWC-USERNAME>@ssh.swc.ucl.ac.uk,<SWC-USERNAME>@hpc-gw2 -L 8082:localhost:8082\n```\nReplace `<node-name>` with your assigned compute node's name (e.g. `gpu-sr670-20`) and keep the port number consistent with step 1.\n\n**3. In your browser**, paste in the full URL from Jupyter's output (including the `?token=` part) \u2014 e.g. `http://localhost:8082/lab?token=abc123...`.\n\nTroubleshooting tips from the doc: if the port is in use, try a different one (e.g. `8888`, `8090`) in both commands; keep your SLURM session alive or the connection will drop.",
+    "pages": [
+     "niu-howto/programming/port-forwarding.md"
+    ],
+    "missing": []
+   }
+  ]
+ },
+ {
+  "id": "sleap-cluster",
+  "question": "How do I train a SLEAP model on the SWC cluster?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 49.2,
+  "tries": [
+   {
+    "answer": "## Training a SLEAP model on the SWC HPC cluster\n\n**Prerequisites**\n- Install SLEAP locally (matching the cluster's module version) and mount the SWC filesystem, since you'll label frames locally but train on the cluster.\n- SSH access: `ssh <SWC-USERNAME>@ssh.swc.ucl.ac.uk` then `ssh hpc-gw2`.\n- On the cluster, check available modules with `module avail SLEAP`, and load the recommended version with `module load SLEAP` (default is the PyTorch-backed v1.6.3; use `module load SLEAP/2025-09-30` for the legacy TensorFlow version).\n\n**1. Prepare the training job (on your local SLEAP install)**\n- Label frames and save your project (e.g. `labels.v002.slp`) on the mounted SWC filesystem.\n- In the SLEAP GUI: *Predict* \u2192 *Run Training\u2026* \u2192 *Export Training Job Package\u2026* (don't hit Run \u2014 that trains locally).\n  - Set *Inference Target* to *Nothing* (train/infer separately on the cluster).\n  - Save the exported zip (e.g. `labels.v002.slp.training_job.zip`) to the mounted filesystem and unzip it. This gives you a folder with YAML configs (e.g. `centroid.yaml`, `centered_instance.yaml`) and a packaged labels file (`.pkg.slp`).\n\n**2. Run the training job (on the cluster)**\n- SSH in, `cd` into the unzipped training job folder.\n- Create a SLURM batch script, e.g. `train-slurm.sh`:\n\n```bash\n#!/bin/bash\n#SBATCH -J slp_train # job name\n#SBATCH -p gpu # partition (queue)\n#SBATCH -N 1   # number of nodes\n#SBATCH --mem 32G # memory pool for all cores\n#SBATCH --ntasks-per-node=1 # one process per node\n#SBATCH --cpus-per-task=8   # CPU cores available to the process\n#SBATCH -t 0-06:00 # time (D-HH:MM)\n#SBATCH --gres gpu:a100:1 # request 1 GPU of a given type\n#SBATCH -o slurm.%x.%N.%j.out # STDOUT\n#SBATCH -e slurm.%x.%N.%j.err # STDERR\n#SBATCH --mail-type=ALL\n#SBATCH --mail-user=user@domain.com\n\nnvidia-smi\nmodule load SLEAP\n\nsleap train --config-name centroid.yaml --config-dir . trainer_config.ckpt_dir='models'\nsleap train --config-name centered_instance.yaml --config-dir . trainer_config.ckpt_dir='models'\n```\n\n(Don't just copy the auto-generated `train-script.sh` verbatim \u2014 it can contain paths/args that break on the cluster; the doc recommends writing the `sleap train` commands yourself as above.)\n\n- Submit it from inside the training job folder (relative paths matter): `sbatch train-slurm.sh`\n- Monitor with `squeue --me`, `sacct`, or by viewing the `slurm.*.out`/`.err` log files.\n\n**3. Evaluate**\n- Trained models land in a `models/` subfolder (one per run), each with `best.ckpt`, `training_config.yaml`, and metrics.\n- Use the local SLEAP GUI (*Predict* \u2192 *Evaluation Metrics for Trained Models...*) to inspect metrics.\n\nFull guide with GPU-type selection, OOM troubleshooting, inference (`sleap track`), and the legacy TensorFlow equivalents: [Use SLEAP on the SWC HPC cluster](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/data_analysis/HPC-module-SLEAP.md)",
+    "pages": [
+     "niu-howto/data_analysis/HPC-module-SLEAP.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "## Training a SLEAP model on the SWC HPC cluster\n\n**1. Prerequisites**\n- Install SLEAP locally too (for labeling/GUI steps): `uv tool install --python 3.13 \"sleap[nn]==1.6.3\" --with \"sleap-io==0.7.0\" --with \"sleap-nn==0.2.0\" --torch-backend auto` (match your local version to the cluster module).\n- Mount the SWC filesystem locally and keep your project data on `/ceph/...`.\n\n**2. Prepare the training job (on your local SLEAP GUI)**\n- Label frames and save the `.slp` project to the mounted `ceph` filesystem.\n- In SLEAP GUI: *Predict* \u2192 *Run Training\u2026* \u2192 **Export Training Job Package\u2026** (don't hit Run). Set **Inference Target** to **Nothing**.\n- Save/unzip the exported package (e.g. `labels.v002.slp.training_job.zip`) on `ceph`. It contains YAML configs (`centroid.yaml`, `centered_instance.yaml`, etc.) and a packaged labels file (`.pkg.slp`).\n\n**3. Run the training job on the cluster**\n```\nssh <SWC-USERNAME>@ssh.swc.ucl.ac.uk\nssh hpc-gw2\ncd /path/to/labels.v002.slp.training_job\n```\nCreate `train-slurm.sh`:\n```bash\n#!/bin/bash\n#SBATCH -J slp_train\n#SBATCH -p gpu\n#SBATCH -N 1\n#SBATCH --mem 32G\n#SBATCH --ntasks-per-node=1\n#SBATCH --cpus-per-task=8\n#SBATCH -t 0-06:00\n#SBATCH --gres gpu:a100:1\n#SBATCH -o slurm.%x.%N.%j.out\n#SBATCH -e slurm.%x.%N.%j.err\n#SBATCH --mail-type=ALL\n#SBATCH --mail-user=user@domain.com\n\nnvidia-smi\nmodule load SLEAP\n\nsleap train --config-name centroid.yaml --config-dir . trainer_config.ckpt_dir='models'\nsleap train --config-name centered_instance.yaml --config-dir . trainer_config.ckpt_dir='models'\n```\nThen submit it from inside the training job folder (paths are relative):\n```\nsbatch train-slurm.sh\n```\n\n**4. Monitor**\n`squeue --me`, `sacct`, or check the `slurm.*.out`/`.err` log files.\n\n**5. Evaluate**\nA `models/` folder appears with one subfolder per run (e.g. `best.ckpt`, `metrics.val.0.npz`). Load it in the local SLEAP GUI via *Predict* \u2192 *Evaluation Metrics for Trained Models...*.\n\nNotes:\n- `module load SLEAP` gives you the recommended PyTorch-based v1.6.3; for the legacy TensorFlow backend use `module load SLEAP/2025-09-30` and the `sleap-train`/JSON-config commands instead.\n- Check available GPU types with `sinfo -p gpu,gpu_lowp -o \"%N %G\" --noheader`; avoid GPUs with CUDA compute capability below 7.5.\n\nFull guide: [Use SLEAP on the SWC HPC cluster](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/data_analysis/HPC-module-SLEAP.md)\n\nFor SSH setup details: [Set up SSH for the SWC HPC cluster](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/programming/SSH-SWC-cluster.md)",
+    "pages": [
+     "niu-howto/data_analysis/HPC-module-SLEAP.md"
+    ],
+    "missing": []
+   }
+  ]
+ },
+ {
+  "id": "cruft",
+  "question": "How do I pull template updates into a project I made with the NIU cookiecutter?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 43.7,
+  "tries": [
+   {
+    "answer": "NIU recommends using **cruft** to keep a cookiecutter-generated project in sync with the template. Steps, from the docs:\n\n1. **Install cruft**: `pip install cruft`\n2. **First-time setup** \u2014 link your repo to the template:\n   ```\n   cruft link https://github.com/neuroinformatics-unit/python-cookiecutter\n   ```\n   - Answer the cookiecutter prompts the same way you did originally.\n   - When asked for `github_repository_url`, choose \"provide later\" (entering the real URL makes `cruft diff` fail).\n   - You'll then be asked for the commit hash of the cookiecutter version you originally generated from \u2014 find it by searching the template repo's history (e.g. `9daec12bffbc32da6a252605c5e67c90028fefc0`).\n   - This creates a `.cruft.json` file (track it in git) storing the template URL, commit hash, and your prompt answers.\n3. **See what changed**: `cruft diff`\n4. **Apply the updates**: `cruft update` \u2014 confirm with `y` (or `v` to preview first).\n   - It won't delete files you've added since creation, and won't delete files removed from the template \u2014 those you handle manually.\n   - If some changes can't be applied cleanly, it creates `.rej` files per conflicting file; resolve those manually and delete the `.rej` files when done.\n   - `.cruft.json` gets updated with the new commit hash afterward.\n5. **Check status anytime**: `cruft check` (boolean: up to date or not)\n6. **Commit** your changes on a new branch, open a PR, and check that CI passes before merging.\n\nSource: [Update cookiecutter-generated files with cruft](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/programming/Cookiecutter-cruft.md)",
+    "pages": [
+     "",
+     "niu-howto/programming/Cookiecutter-cruft.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "You use **cruft** to keep a NIU python-cookiecutter project in sync with the template:\n\n**1. One-time setup** \u2014 `pip install cruft`, then:\n```\ncruft link https://github.com/neuroinformatics-unit/python-cookiecutter\n```\nAnswer the cookiecutter prompts the same way you did originally, but choose \"provide later\" for `github_repository_url` (entering the real URL makes `cruft diff` fail). Cruft will then ask for the commit hash of the cookiecutter version you originally generated from \u2014 find this manually in the template's history. This creates a `.cruft.json` file (track it in git).\n\n**2. Pulling updates:**\n- `cruft diff` \u2014 shows what's changed between your repo and the template (you can apply a subset manually if you want).\n- `cruft update` \u2014 applies the template changes for you; confirm with `y`, or press `v` first to preview.\n- `cruft check` \u2014 just tells you (boolean) whether you're up to date.\n\nNotes:\n- `cruft update` won't delete files you've added since creation, and won't remove files that were deleted from the template \u2014 you handle those manually.\n- If some changes can't be applied automatically, you'll get `your_file.rej` files per conflict; resolve manually and delete the `.rej` files when done.\n- After `cruft update`, `.cruft.json` is updated with the new commit hash for future updates.\n\n**3. Finish up** \u2014 commit to a new branch, open a PR into `main`, and check that CI passes before merging.\n\nSource: [Update cookiecutter-generated files with cruft](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/programming/Cookiecutter-cruft.md)",
+    "pages": [
+     "",
+     "niu-howto/programming/Cookiecutter-cruft.md"
+    ],
+    "missing": []
+   }
+  ]
+ },
+ {
+  "id": "licence",
+  "question": "Which licence should I choose for my research software?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 38.2,
+  "tries": [
+   {
+    "answer": "**Recommendation: BSD-3-Clause** \u2014 unless your software has commercial potential or depends on other software with a restrictive license.\n\nKey points from the guide:\n- **Default choice:** [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) \u2014 simple, allows virtually unrestricted use, with a liability disclaimer.\n- Use an existing, well-established license (don't write your own \u2014 e.g. don't restrict to \"academic use only\").\n- Before choosing, make sure you have permission to license the software (from your group leader/department) and from any co-contributors, especially across institutions.\n- If the software might have **commercial potential**, contact your institutional IP/tech transfer office (e.g. UCL Business) *before* release.\n- Check licenses of any dependencies you bundle/link against \u2014 restrictive licenses (GPL family) may constrain your choice; calling a separately-installed library is usually fine.\n- You can change the license later, but earlier released versions remain under the original terms \u2014 so choose carefully upfront.\n- To add it: put the license text in a `LICENSE.txt` file in your repo (GitHub's \"Choose a license template\" button can help).\n\nFor specific/unusual requirements, use [choosealicense.com](https://choosealicense.com/) or [tldrlegal.com](https://tldrlegal.com/).\n\nSource: [Software licensing \u2014 NIU how-to guides](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/open_science/Licensing.md)",
+    "pages": [
+     "niu-howto/open_science/Licensing.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "**Recommendation: BSD-3-Clause**, unless your software has commercial potential or depends on other software with a restrictive licence.\n\nKey points from the NIU guide:\n\n- Default: use the [3-Clause BSD License](https://opensource.org/licenses/BSD-3-Clause) \u2014 simple, allows virtually unrestricted use, with a liability disclaimer.\n- Steps before choosing:\n  1. Make sure you have permission to license it (often up to your group leader/department head).\n  2. Get written permission from any other contributors, especially from other institutes.\n  3. If it might have commercial potential, contact your institutional IP/tech transfer team (e.g. UCL Business) *before* releasing.\n  4. Check your funder/institute requirements (note: UCL, Gatsby, and Wellcome had no formal OSS licensing policy at time of writing).\n  5. Check the licences of dependencies and ensure compatibility.\n  6. Consider what licences are common in your field, for ecosystem compatibility.\n  7. For specific needs, use [choosealicense.com](https://choosealicense.com/).\n- To add it: put the licence text in a `LICENSE.txt` file in your repo (GitHub's web UI has a \"Choose a license template\" button when you create that file).\n- Note: you can change the licence later, but earlier releases remain under the original terms \u2014 so it's worth deciding carefully upfront.\n\nThis is **not legal advice** \u2014 the doc is explicit about that. Full page: [Software licensing](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/open_science/Licensing.md)",
+    "pages": [
+     "niu-howto/open_science/Licensing.md"
+    ],
+    "missing": []
+   }
+  ]
+ },
+ {
+  "id": "gin-dataset",
+  "question": "How do I publish a dataset on GIN?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 42.8,
+  "tries": [
+   {
+    "answer": "**Source:** [Create a GIN repository for your dataset](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/open_science/GIN-repositories.md)\n\n### One-time setup\n1. Create a [GIN account](https://gin.g-node.org/user/sign_up).\n2. [Download the GIN CLI](https://gin.g-node.org/G-Node/Info/wiki/GIN+CLI+Setup#setup-gin-client) and log in:\n   ```\n   $ gin login\n   ```\n3. Confirm it's working: `gin --version`\n\n### Create and upload a repository\n1. **Log in**: `gin login`\n2. **Initialise a repository** \u2014 pick one:\n   - In a new directory: `gin create <repository-name>` (creates the repo both on the GIN server and locally)\n   - In an existing directory: `cd` into it, then `gin create --here <repository-name>`\n3. **Add files**, then commit and upload:\n   ```\n   $ gin commit --message <message> <filename>\n   $ gin upload <filename>\n   ```\n   `<filename>` can be a wildcard (e.g. `*.png`), a list of files, or `.` for all changed files. `gin upload` sends all local changes (including deletions/renames) to the server.\n4. **Decide on file locking** (optional) \u2014 locked files save local disk space and prevent future edits; unlocked files can be edited but double local storage (see \"File locking\" section on the page). Toggle with `gin lock <filename>` / `gin unlock <filename>`, then commit the state change.\n\nHelpful status commands: `gin ls` (status, like `git status`), `gin sync` (bi-directional sync), `gin logout`.\n\n### Make it public\nBy default new GIN repos are **private**. To make one public:\n1. Go to the repo's homepage (list yours with `gin repos --all`).\n2. Click **Settings** (top right).\n3. Uncheck **Private** under Basic settings.\n\nThat's the full publish workflow per the docs \u2014 let me know if you want the download/update side too.",
+    "pages": [
+     "niu-howto/open_science/GIN-repositories.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "Here's how to publish a dataset on GIN, per the NIU how-to guide:\n\n**One-time setup**\n1. Create a GIN account: https://gin.g-node.org/user/sign_up\n2. Download/set up the GIN CLI, then log in:\n   ```\n   gin login\n   ```\n3. Check it's working: `gin --version`\n\n**Create the repository**\n- In a new directory:\n  ```\n  gin create <repository-name>\n  ```\n  This creates the repo both on the GIN server and locally, then you move/copy your files in.\n- Or, in an existing directory, from inside it:\n  ```\n  gin create --here <repository-name>\n  ```\n\n**Add and upload your data**\n```\ngin commit --message <message> <filename>\ngin upload <filename>\n```\n`<filename>` can be a wildcard (e.g. `*.png`), a list of files, or `.` for everything changed. `gin upload` (with no filename) syncs all changes, including deletions/renames.\n\n**Decide on locking**\nOptionally lock the data (`gin lock <filename>`) for long-term archival/read-only storage, or keep it unlocked if you'll keep editing large files \u2014 then commit the lock-state change.\n\n**Make it public**\nNew GIN repos are private by default. To publish it publicly:\n1. Go to the repo's homepage on GIN (list yours with `gin repos --all`)\n2. Click *Settings* (top right)\n3. Uncheck *Private* under *Basic settings*\n\nUseful commands along the way: `gin ls` (status), `gin sync` (bidirectional sync), `gin logout`.\n\nSource: [Create a GIN repository for your dataset](https://github.com/neuroinformatics-unit/neuroinformatics-unit/blob/29043ff0fe2692cddca11ee573d8a4e1ba263ecd/docs/source/howto/open_science/GIN-repositories.md)",
+    "pages": [
+     "",
+     "niu-howto/open_science/GIN-repositories.md"
+    ],
+    "missing": []
+   }
+  ]
+ },
+ {
+  "id": "movement-load",
+  "question": "How do I load DeepLabCut or SLEAP tracks into movement?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 54.6,
+  "tries": [
+   {
+    "answer": "## Loading DeepLabCut or SLEAP tracks into `movement`\n\n**Unified loader (recommended):**\n```python\nfrom movement.io import load_dataset\n\nds = load_dataset(\n    \"/path/to/file.h5\",\n    source_software=\"auto\",  # default; infers from file format\n    fps=30,\n)\n```\nIf you want to force a specific loader (useful since DLC-style `.csv` can be ambiguous with LightningPose):\n```python\nds = load_dataset(\"/path/to/file.csv\", source_software=\"DeepLabCut\", fps=30)\n```\n\n**Software-specific functions** (from `movement.io.load_poses`):\n\n- DeepLabCut (`.h5` or `.csv`):\n  ```python\n  from movement.io import load_poses\n  ds = load_poses.from_dlc_file(\"/path/to/file.h5\", fps=30)\n  ```\n  You can also load a DLC-style pandas DataFrame directly: `load_poses.from_dlc_style_df(df, fps=30)`.\n  Note: all individuals must share the same set of keypoints \u2014 DLC's multi-animal per-individual keypoint sets aren't supported.\n\n- SLEAP:\n  ```python\n  ds = load_poses.from_sleap_file(\"/path/to/file.analysis.h5\", fps=30)  # recommended\n  # or (experimental):\n  ds = load_poses.from_sleap_file(\"/path/to/file.predictions.slp\", fps=30)\n  ```\n\nProviding `fps` makes the dataset's time coordinates be in seconds rather than frame numbers.\n\nSource: [movement Input/Output guide](https://github.com/neuroinformatics-unit/movement/blob/v0.18.0/docs/source/user_guide/input_output.md)",
+    "pages": [
+     "movement/user_guide/input_output.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "## Loading DeepLabCut or SLEAP tracks into `movement`\n\nUse the unified `load_dataset()` function, which auto-detects the source software from the file format:\n\n```python\nfrom movement.io import load_dataset\n\nds = load_dataset(\"/path/to/file.h5\", source_software=\"auto\", fps=30)\n```\n\nOr specify the software explicitly if you want to be sure:\n\n```python\n# DeepLabCut (.h5 or .csv)\nds = load_dataset(\"/path/to/file.h5\", source_software=\"DeepLabCut\", fps=30)\n\n# SLEAP (.analysis.h5 recommended, or .slp)\nds = load_dataset(\"/path/to/file.analysis.h5\", source_software=\"SLEAP\", fps=30)\n```\n\n`fps` is optional but recommended \u2014 it converts time coordinates to seconds instead of frame numbers.\n\n### Software-specific loaders\nIf you want direct access instead of the auto-dispatching function:\n\n```python\nfrom movement.io import load_poses\n\n# DeepLabCut\nds = load_poses.from_dlc_file(\"/path/to/file.h5\", fps=30)        # .h5\nds = load_poses.from_dlc_file(\"/path/to/file.csv\", fps=30)       # .csv\nds = load_poses.from_dlc_style_df(df, fps=30)                     # pandas DataFrame\n\n# SLEAP\nds = load_poses.from_sleap_file(\"/path/to/file.analysis.h5\", fps=30)   # recommended\nds = load_poses.from_sleap_file(\"/path/to/file.predictions.slp\", fps=30)  # experimental\n```\n\n**Note:** `movement` requires all individuals to share the same set of keypoints \u2014 DeepLabCut's multi-animal projects with per-individual keypoints aren't supported.\n\nFull reference: [movement Input/Output guide](https://github.com/neuroinformatics-unit/movement/blob/v0.18.0/docs/source/user_guide/input_output.md)",
+    "pages": [
+     "movement/user_guide/input_output.md"
+    ],
+    "missing": []
+   }
+  ]
+ },
+ {
+  "id": "brainglobe-install",
+  "question": "How do I install the BrainGlobe tools?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 47.6,
+  "tries": [
+   {
+    "answer": "## Installing BrainGlobe\n\n1. Create and activate a virtual environment (conda or venv) running Python 3.10, 3.11, or 3.12. For conda:\n```bash\nconda create -c conda-forge -n brainglobe-env python=3.12\n```\n\n2. Install all BrainGlobe tools with pip:\n```bash\npip install brainglobe\n```\nThis fetches all BrainGlobe tools, their Python APIs, `napari` plugins (where available), and `napari` itself.\n\n3. (Optional) If you want the analysis workflows (e.g. `brainmapper`), also install:\n```bash\npip install brainglobe-workflows>=1.0.0\n```\n\n**Updating:** `pip install brainglobe --upgrade`\n\n**Individual tools:** Each tool in the suite can also be installed separately by following that tool's own install instructions, but the docs note this may lead to version conflicts or dependency issues, and recommend the combined `brainglobe` install unless you're confident resolving those yourself.\n\nSource: [Installing BrainGlobe](https://github.com/brainglobe/brainglobe.github.io/blob/37ddde1a5d1b5f15cc90649641b80bb14f4c5348/docs/source/documentation/index.md)",
+    "pages": [
+     "",
+     "brainglobe/documentation/index.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "To install the BrainGlobe tools:\n\n1. **Create and activate a virtual environment** (conda recommended), running Python 3.10, 3.11, or 3.12:\n   ```bash\n   conda create -c conda-forge -n brainglobe-env python=3.12\n   conda activate brainglobe-env\n   ```\n\n2. **Install all BrainGlobe tools** with pip:\n   ```bash\n   pip install brainglobe\n   ```\n   This fetches all BrainGlobe tools, their Python APIs, and `napari` plugins (installing `napari` too).\n\n3. **Optional \u2014 analysis workflows** (e.g. `brainmapper`, formerly the `cellfinder` CLI):\n   ```bash\n   pip install brainglobe-workflows>=1.0.0\n   ```\n   This installs `brainglobe` too if not already present.\n\nTo **update** later:\n```bash\npip install brainglobe --upgrade\n```\n\nYou can also install individual tools separately by following each tool's own install instructions, but the docs note this risks version conflicts/dependency issues, so they recommend the combined `brainglobe` package instead.\n\nSource: [Installing BrainGlobe](https://github.com/brainglobe/brainglobe.github.io/blob/37ddde1a5d1b5f15cc90649641b80bb14f4c5348/docs/source/documentation/index.md), with conda setup details from [Using conda](https://github.com/brainglobe/brainglobe.github.io/blob/37ddde1a5d1b5f15cc90649641b80bb14f4c5348/docs/source/documentation/setting-up/conda.md).",
+    "pages": [
+     "brainglobe/documentation/index.md",
+     "brainglobe/documentation/setting-up/conda.md"
+    ],
+    "missing": []
+   }
+  ]
+ },
+ {
+  "id": "photon-mosaic-suite2p",
+  "question": "How do I install photon-mosaic with suite2p support?",
+  "passed": true,
+  "passes": 2,
+  "seconds": 29.6,
+  "tries": [
+   {
+    "answer": "To install photon-mosaic with suite2p support (from the [Usage page](https://github.com/photon-mosaic/photon-mosaic/blob/v0.0.2/docs/source/user-guide.md)):\n\n1. Create and activate a virtual environment with `uv` (Python 3.12 or 3.13 supported):\n```bash\nuv venv --python 3.13\nsource .venv/bin/activate\n```\n\n2. Install photon-mosaic with the `suite2p` extra:\n```bash\nuv pip install \"photon-mosaic[suite2p]\"\n```\n\nIf you also want the example-notebook dependencies (`widgets` and `deconvolution`), install all three extras together:\n```bash\nuv pip install \"photon-mosaic[widgets,suite2p,deconvolution]\"\n```",
+    "pages": [
+     "photon-mosaic/user-guide.md"
+    ],
+    "missing": []
+   },
+   {
+    "answer": "To install photon-mosaic with suite2p support (Python 3.12 or 3.13 required):\n\n```bash\nuv venv --python 3.13\nsource .venv/bin/activate\nuv pip install \"photon-mosaic[suite2p]\"\n```\n\nThe `suite2p` extra is needed because suite2p functionality is the default for many of photon-mosaic's steps. If you also want the other extras (for the example notebooks), use `uv pip install \"photon-mosaic[widgets,suite2p,deconvolution]\"`.\n\nSource: [photon-mosaic Usage docs](https://github.com/photon-mosaic/photon-mosaic/blob/v0.0.2/docs/source/user-guide.md)",
+    "pages": [
+     "photon-mosaic/user-guide.md"
+    ],
+    "missing": []
+   }
+  ]
+ }
+]
