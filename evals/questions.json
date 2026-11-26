@@ -1,0 +1,62 @@
+[
+ {
+  "id": "ssh-cluster",
+  "question": "How do I connect to the SWC HPC cluster from my laptop?",
+  "page": "niu-howto/programming/SSH-SWC-cluster.md",
+  "facts": [["ssh.swc.ucl.ac.uk"], ["hpc-gw2"]]
+ },
+ {
+  "id": "slurm-gpu",
+  "question": "How do I ask for a GPU in a SLURM batch script?",
+  "page": "niu-howto/programming/SLURM-arguments.md",
+  "facts": [["--gres"], ["#SBATCH"]]
+ },
+ {
+  "id": "jupyter-on-node",
+  "question": "I'm running Jupyter on a cluster node. How do I open it in my browser?",
+  "page": "niu-howto/programming/port-forwarding.md",
+  "facts": [["-L "], ["port forwarding", "port-forwarding", "forward"]]
+ },
+ {
+  "id": "sleap-cluster",
+  "question": "How do I train a SLEAP model on the SWC cluster?",
+  "page": "niu-howto/data_analysis/HPC-module-SLEAP.md",
+  "facts": [["module load SLEAP"], ["sbatch", "SLURM"]]
+ },
+ {
+  "id": "cruft",
+  "question": "How do I pull template updates into a project I made with the NIU cookiecutter?",
+  "page": "niu-howto/programming/Cookiecutter-cruft.md",
+  "facts": [["cruft update"], ["cruft link"]]
+ },
+ {
+  "id": "licence",
+  "question": "Which licence should I choose for my research software?",
+  "page": "niu-howto/open_science/Licensing.md",
+  "facts": [["BSD-3", "BSD 3"]]
+ },
+ {
+  "id": "gin-dataset",
+  "question": "How do I publish a dataset on GIN?",
+  "page": "niu-howto/open_science/GIN-repositories.md",
+  "facts": [["gin login"], ["gin create"]]
+ },
+ {
+  "id": "movement-load",
+  "question": "How do I load DeepLabCut or SLEAP tracks into movement?",
+  "page": "movement/user_guide/input_output.md",
+  "facts": [["load_dataset", "load_poses"], ["source_software"]]
+ },
+ {
+  "id": "brainglobe-install",
+  "question": "How do I install the BrainGlobe tools?",
+  "page": "brainglobe/documentation/index.md",
+  "facts": [["pip install brainglobe"], ["environment"]]
+ },
+ {
+  "id": "photon-mosaic-suite2p",
+  "question": "How do I install photon-mosaic with suite2p support?",
+  "page": "photon-mosaic/user-guide.md",
+  "facts": [["photon-mosaic["], ["suite2p"]]
+ }
+]

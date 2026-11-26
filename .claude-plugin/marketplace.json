@@ -1,0 +1,12 @@
+{
+  "name": "niu",
+  "description": "Claude Code plugins from the Neuroinformatics Unit.",
+  "owner": { "name": "Neuroinformatics Unit" },
+  "plugins": [
+    {
+      "name": "niu-assistant",
+      "source": "./",
+      "description": "The NIU's public docs as tools, plus a skill that answers from them."
+    }
+  ]
+}

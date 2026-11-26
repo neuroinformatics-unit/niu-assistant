@@ -4,6 +4,8 @@
 ci:
     autoupdate_schedule: monthly
 
+# Benchmark results record what the models said; leave them as written.
+exclude: ^evals/results/
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v6.0.0

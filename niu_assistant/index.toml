@@ -1,0 +1,199 @@
+# The pages the assistant routes to. Nothing here is copied: each page is read
+# from its project's own repository at the pinned `ref`, so answers stay the
+# same until a pin is moved on purpose. Moving a pin is a commit, and the
+# benchmark is rerun after it.
+#
+# A page's id is "<source>/<path>". `root` is the docs folder in the repo.
+
+[[source]]
+name = "niu-howto"
+title = "NIU how-to guides"
+repo = "neuroinformatics-unit/neuroinformatics-unit"
+ref = "29043ff0fe2692cddca11ee573d8a4e1ba263ecd"
+root = "docs/source/howto"
+
+[[source.page]]
+path = "programming/SSH-SWC-cluster.md"
+title = "Set up SSH for the SWC HPC cluster"
+summary = "Log in to the SWC HPC cluster over SSH: the bastion ssh.swc.ucl.ac.uk, the gateway node hpc-gw2, the node types, and an SSH config file."
+
+[[source.page]]
+path = "programming/SLURM-arguments.md"
+title = "SLURM arguments primer"
+summary = "Write sbatch job scripts for the SWC cluster and the common #SBATCH options: partition, memory, cores, time limit, GPUs, output files."
+
+[[source.page]]
+path = "programming/vscode-with-slurm-job.md"
+title = "Using VS Code with interactive SLURM jobs"
+summary = "Run VS Code on a compute node of the SWC HPC cluster through an interactive SLURM job."
+
+[[source.page]]
+path = "programming/port-forwarding.md"
+title = "Accessing HTTP servers on the HPC with port forwarding"
+summary = "Open a web app running on a cluster node, such as Jupyter, in your own browser with SSH port forwarding through the bastion and gateway."
+
+[[source.page]]
+path = "programming/SSH-vscode.md"
+title = "SSH into an unmanaged machine using VS Code"
+summary = "Connect VS Code over SSH to a machine that is not centrally managed."
+
+[[source.page]]
+path = "programming/Mount-ceph-ubuntu.md"
+title = "Mount ceph storage on Ubuntu permanently"
+summary = "Mount a partition of the SWC ceph storage on Ubuntu so it stays mounted after a reboot, using cifs-utils."
+
+[[source.page]]
+path = "programming/Mount-ceph-ubuntu-temp.md"
+title = "Mount ceph storage on Ubuntu temporarily"
+summary = "Mount a partition of the SWC ceph storage on Ubuntu for the current session only."
+
+[[source.page]]
+path = "programming/Cookiecutter-cruft.md"
+title = "Update cookiecutter-generated files with cruft"
+summary = "Keep a project made from the NIU python-cookiecutter in step with the template: cruft link, cruft diff and cruft update."
+
+[[source.page]]
+path = "programming/Troubleshooting.md"
+title = "Troubleshooting"
+summary = "Fixes for an Ubuntu distribution update error, a terminal that will not open after installing a new Python, and detaching a forked repository on GitHub."
+
+[[source.page]]
+path = "data_analysis/HPC-module-SLEAP.md"
+title = "Use SLEAP on the SWC HPC cluster"
+summary = "Pose estimation with SLEAP on the SWC cluster: module load SLEAP, training and evaluating models and running inference as SLURM jobs."
+
+[[source.page]]
+path = "open_science/Data-sharing.md"
+title = "Data sharing"
+summary = "Sharing code and data when publishing: requirements, where to deposit them, and a list of data repositories for neuroscience."
+
+[[source.page]]
+path = "open_science/GIN-repositories.md"
+title = "Create a GIN repository for your dataset"
+summary = "Create, download and update a dataset on GIN with the gin command-line client, file locking, and downloading GIN data from Python."
+
+[[source.page]]
+path = "open_science/Licensing.md"
+title = "Software licensing"
+summary = "Choose a licence for research software and add it to a repository; recommends BSD-3-Clause unless the code has commercial potential or depends on restrictively licensed software."
+
+[[source.page]]
+path = "electrophysiology/index.md"
+title = "Electrophysiology"
+summary = "Starting point for extracellular electrophysiology at the SWC: learning resources and example pipelines."
+
+[[source.page]]
+path = "electrophysiology/resources.md"
+title = "Electrophysiology resources"
+summary = "Learning resources for extracellular electrophysiology and spike sorting: general and technical introductions, SpikeInterface, other community tools."
+
+[[source]]
+name = "movement"
+title = "movement"
+repo = "neuroinformatics-unit/movement"
+ref = "v0.18.0"
+root = "docs/source"
+
+[[source.page]]
+path = "index.md"
+title = "movement"
+summary = "Overview of movement, a Python toolbox for analysing animal body movements across space and time from motion-tracking outputs such as DeepLabCut and SLEAP."
+
+[[source.page]]
+path = "user_guide/installation.md"
+title = "Installation"
+summary = "Install movement with conda, pip or uv, with or without the napari GUI."
+
+[[source.page]]
+path = "user_guide/input_output.md"
+title = "Input/Output"
+summary = "Load and save pose and bounding-box tracks: load_dataset and save_dataset for the supported tracking formats (DeepLabCut, SLEAP and others), and netCDF to save analysis state."
+
+[[source.page]]
+path = "user_guide/movement_dataset.md"
+title = "The movement datasets"
+summary = "How movement stores poses and bounding boxes as xarray Datasets: data variables, dimensions, coordinates and attributes."
+
+[[source.page]]
+path = "user_guide/gui.md"
+title = "Graphical user interface"
+summary = "The movement napari plugin: view tracks over video frames, correct tracking errors, and define regions of interest."
+
+[[source]]
+name = "brainglobe"
+title = "BrainGlobe"
+repo = "brainglobe/brainglobe.github.io"
+ref = "37ddde1a5d1b5f15cc90649641b80bb14f4c5348"
+root = "docs/source"
+
+[[source.page]]
+path = "documentation/index.md"
+title = "Installing BrainGlobe"
+summary = "Install the BrainGlobe tools into a virtual environment with pip install brainglobe, and brainglobe-workflows for analysis pipelines such as brainmapper."
+
+[[source.page]]
+path = "documentation/setting-up/conda.md"
+title = "Using conda"
+summary = "Manage Python environments with conda for BrainGlobe tools."
+
+[[source.page]]
+path = "documentation/setting-up/gpu.md"
+title = "Setting up your GPU"
+summary = "Set up an NVIDIA GPU (the same requirements as PyTorch with CUDA) to speed up BrainGlobe tools; not supported on macOS."
+
+[[source.page]]
+path = "documentation/setting-up/image-definition.md"
+title = "Image space definition"
+summary = "Specify the orientation and resolution of image data for BrainGlobe tools: axis order and the orientation convention."
+
+[[source.page]]
+path = "documentation/brainglobe-atlasapi/index.md"
+title = "BrainGlobe Atlas API"
+summary = "brainglobe-atlasapi: one interface to download and use brain atlases from many sources, and the list of available atlases."
+
+[[source.page]]
+path = "documentation/brainglobe-atlasapi/usage/atlas-details.md"
+title = "Atlas details"
+summary = "Choose an atlas by species, developmental stage, reference image modality, region annotations and resolution."
+
+[[source.page]]
+path = "documentation/cellfinder/index.md"
+title = "cellfinder"
+summary = "cellfinder: automated 3D cell detection in whole-brain images (serial two-photon, lightsheet), as a Python module, a napari plugin and the brainmapper workflow."
+
+[[source.page]]
+path = "documentation/cellfinder/installation.md"
+title = "Installing cellfinder"
+summary = "Install cellfinder with pip, and the hardware it needs for large datasets, including a GPU."
+
+[[source.page]]
+path = "documentation/brainreg/index.md"
+title = "brainreg"
+summary = "brainreg: register an atlas template to a sample brain image (NiftyReg backend) to bring atlas annotations into sample space, and the inverse."
+
+[[source.page]]
+path = "documentation/brainrender/index.md"
+title = "brainrender"
+summary = "brainrender: 3D rendering of data registered to a reference atlas, with actors and scenes."
+
+[[source.page]]
+path = "tutorials/index.md"
+title = "Tutorials"
+summary = "BrainGlobe tutorials: viewing atlases in napari, registering a whole brain to an atlas, segmentation, cell detection, and silicon probe tracks."
+
+[[source]]
+name = "photon-mosaic"
+title = "photon-mosaic"
+repo = "photon-mosaic/photon-mosaic"
+ref = "v0.0.2"
+root = "docs/source"
+
+[[source.page]]
+path = "index.md"
+title = "photon-mosaic"
+summary = "Home page of the photon-mosaic docs for multiphoton calcium-imaging analysis: user guide, examples, developer introduction, contributing."
+
+[[source.page]]
+path = "user-guide.md"
+title = "Usage"
+summary = "Install photon-mosaic with uv (Python 3.12 or 3.13) and its extras (widgets, suite2p, deconvolution); it is a Python API used from scripts and notebooks."

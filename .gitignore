@@ -81,3 +81,9 @@ venv/
 
 # written by setuptools-scm
 **/_version.py
+
+# uvx runs the plugin from the source; no lock file
+uv.lock
+
+# Benchmark answers stay on the machine that ran them; only scores.csv is committed
+evals/results/*/

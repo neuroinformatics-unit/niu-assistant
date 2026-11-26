@@ -1,0 +1,7 @@
+{
+  "name": "niu-assistant",
+  "displayName": "NIU assistant",
+  "description": "Routes questions to the public docs of the Neuroinformatics Unit (HPC and SSH how-tos, open science), movement, BrainGlobe and photon-mosaic, read at pinned versions.",
+  "author": { "name": "Neuroinformatics Unit" },
+  "repository": "https://github.com/neuroinformatics-unit/niu-assistant"
+}
