@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.11.0"
 dynamic = ["version"]
 
-dependencies = []
+dependencies = [
+    "mcp>=2.3.0",
+]
 
 license = "BSD-3-Clause"
 
@@ -21,6 +23,10 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
 ]
+
+[project.scripts]
+niu-assistant = "niu_assistant.server:main"
+niu-assistant-eval = "niu_assistant.evaluate:main"
 
 [project.urls]
 "Homepage" = "https://github.com/neuroinformatics-unit/niu-assistant"
@@ -52,6 +58,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 include-package-data = true
 
+[tool.setuptools.package-data]
+niu_assistant = ["index.toml"]
+
 [tool.setuptools.packages.find]
 include = ["niu_assistant*"]
 exclude = ["tests*"]
@@ -63,6 +72,7 @@ filterwarnings = [
 ]
 
 [tool.setuptools_scm]
+fallback_version = "0.0.0"
 
 [tool.check-manifest]
 ignore = [
