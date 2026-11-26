@@ -65,12 +65,13 @@ uv run niu-assistant-eval --model sonnet --effort medium
 asks each question twice through Claude Code with this checkout as the
 plugin and scores the answers. The scores go to `evals/results/scores.csv`,
 one row per question per run, with the model ID that answered and the Claude
-Code version; the answers go to
-`evals/results/<model>-<effort>/<time>/results.json`. The printed summary
+Code version. The answers go to
+`evals/results/<model>-<effort>/<time>/results.json` on your machine, for
+reading a failure; they are not committed. The printed summary
 flags any question that passed in the previous run of the same model and
 effort and now fails on every repeat, lists those that pass on some repeats
-only, and says when the model ID has changed since that run. Commit the
-results, so the next run has something to compare against. It runs on your
+only, and says when the model ID has changed since that run. Commit
+`scores.csv`, so the next run has something to compare against. It runs on your
 own Claude Code login.
 
 ## Adding a page

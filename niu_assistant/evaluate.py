@@ -4,12 +4,13 @@ checkout as the plugin, score the answers, and save the run per model.
 Each question in evals/questions.json lists the facts a good answer must
 contain (any one of each group of alternatives). Every question is asked
 REPEATS times, since answers vary between runs; it passes only if every
-repeat does. The answers are saved under evals/results/<model>-<effort>/
-<time>/results.json, and the scores go to evals/results/scores.csv, one row
-per question per run, with the model ID that answered and the Claude Code
-version. The printed summary flags questions that passed in the last run of
-the same model and effort and now fail on every repeat, and says when the
-model ID differs from that run's.
+repeat does. The scores go to evals/results/scores.csv, one row per
+question per run, with the model ID that answered and the Claude Code
+version; that file is committed. The answers are saved locally under
+evals/results/<model>-<effort>/<time>/results.json and are not
+committed. The printed summary flags questions that passed in the last run
+of the same model and effort and now fail on every repeat, and says when
+the model ID differs from that run's.
 
 Usage: niu-assistant-eval --model sonnet [--effort medium] [--repeats 2]
 """
