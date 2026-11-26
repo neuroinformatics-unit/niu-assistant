@@ -59,7 +59,7 @@ checks, without a model, that each question's page is in the top three
 search results.
 
 ```bash
-uv run niu-assistant-eval --model sonnet --effort medium
+uv run niu-assistant-eval --model claude-sonnet-5-5 --effort medium
 ```
 
 asks each question twice through Claude Code with this checkout as the
@@ -72,7 +72,9 @@ flags any question that passed in the previous run of the same model and
 effort and now fails on every repeat, lists those that pass on some repeats
 only, and says when the model ID has changed since that run. Commit
 `scores.csv`, so the next run has something to compare against. It runs on your
-own Claude Code login.
+own Claude Code login. Pass a full model ID rather than an alias such as
+`sonnet`: an alias moves to each new release, and the benchmark would
+change model without anyone deciding it.
 
 ## Adding a page
 

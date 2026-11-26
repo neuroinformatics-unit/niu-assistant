@@ -12,7 +12,8 @@ committed. The printed summary flags questions that passed in the last run
 of the same model and effort and now fail on every repeat, and says when
 the model ID differs from that run's.
 
-Usage: niu-assistant-eval --model sonnet [--effort medium] [--repeats 2]
+Usage: niu-assistant-eval --model claude-sonnet-5-5 [--effort medium]
+       [--repeats 2]
 """
 
 from __future__ import annotations
@@ -180,7 +181,11 @@ def summary(results: list[dict], previous: list[dict], name: str, model_id):
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--model", required=True, help="e.g. sonnet, opus")
+    parser.add_argument(
+        "--model",
+        required=True,
+        help="a full model ID, e.g. claude-sonnet-5-5",
+    )
     parser.add_argument("--effort", default="medium")
     parser.add_argument("--repeats", type=int, default=2)
     args = parser.parse_args(argv)
