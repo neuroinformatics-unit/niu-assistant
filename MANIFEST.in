@@ -1,8 +1,12 @@
 include LICENSE
 include README.md
 exclude .pre-commit-config.yaml
+exclude .mcp.json
 
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 recursive-exclude docs *
+recursive-exclude .claude-plugin *
+recursive-exclude skills *
+recursive-exclude evals *
 recursive-exclude tests *
